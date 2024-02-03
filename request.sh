@@ -1,0 +1,1 @@
+curl -X "GET" "http://localhost:3000/damage-summary-by-date?dateStart=2013-12-22&dateEnd=2014-01-05"
