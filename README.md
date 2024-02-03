@@ -1,73 +1,68 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Inicialização do projeto
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Antes de executar qualquer comando, copie o arquivo .env.sample e altere com os dados de acesso ao banco de dados local.
+Caso prefira, pode executar o arquivo start-database{.sh,.bat} para criar uma máquina docker com postgres iniciado.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
+Para iniciar o banco de dados, deve-se rodar o comando:
 ```bash
-$ yarn install
+npm run db:setup
+```
+Para iniciar a aplicação com instalação de dependências deve-se rodar:
+```bash
+npm run startup
+```
+Para fazer uma requisição ao endpoint criei dois arquivos de script, um para ambiente linux e outro para windows:
+- request.sh
+- request.bat
+
+Ambos os arquivos executam um cURL para chamada do endpoint.
+
+Para rodar os testes o comando é o seguinte:
+```bash
+npm run test
 ```
 
-## Running the app
+# Análise inicial arquitetural
 
-```bash
-# development
-$ yarn run start
+Primeiramente identifiquei que o projeto utiliza a estrutura de use-cases, então resolvi alterar a estrutura de pastas para separar adequadamente as funções.
+Estou acostumado a utilizar classes para implementar meus projetos, porém como a implementação base está utilizando funções, preferi manter.
 
-# watch mode
-$ yarn run start:dev
+Geralmente gosto de utilizar a seguinte arquitetura:
 
-# production mode
-$ yarn run start:prod
-```
+- entities: entidades do negócio
+- dtos: modelos de transferência de dados
+- repositories: acesso a dados do banco de dados
+- controllers: onde ficam declarados os endpoints
+- services/use-cases: onde ficam as regras de negócio
 
-## Test
+Por geralmente utilizar DDD, sempre separo os projetos por módulos, porém como é um projeto mais simples, preferi manter sem módulos
 
-```bash
-# unit tests
-$ yarn run test
+# Análise de stack
 
-# e2e tests
-$ yarn run test:e2e
+A stack padrão quando estou programando com javascript usando typescript costumo usar:
 
-# test coverage
-$ yarn run test:cov
-```
+- TypeORM (acesso a banco de dados)
+- Nestjs (requisições HTTP e injeção de dependência)
+- class-validator (Validação de dados de entrada)
 
-## Support
+Para projetos com javascript puro, acredito que a seguinte stack seja mais interessante:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Sequelize (acesso a banco de dados)
+- Express
 
-## Stay in touch
+Como a primeira stack geralmente é a que eu mais uso, decidi fazer outra implementação do projeto na branch *my-stack* para demonstrar habilidades.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Cenários de teste
 
-## License
+Para os testes, mapeei os seguintes tratamentos que devem ser feitos na regra de negócio:
 
-Nest is [MIT licensed](LICENSE).
+- Foi inserida um data de início maior que de fim
+- Foi inserido apenas uma das datas ou nenhuma
+- O range em questão não tem dados
+
+# Possíveis bugs encontrados no use case:
+
+- avg não estava sendo calculado, apenas era somado o total dos danos e não era feita nem a divisão nem o arredondamento
+- troquei o delete pela função própria para isto, que é do objeto Reflect
+- os objetos minDamageEvent e maxDamageEvent ficaram com as datas, mesmo não sendo necessário
+- para dias que não possuem dados no mesmo range precisam ser adicionados
