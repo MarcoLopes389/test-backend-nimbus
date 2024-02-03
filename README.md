@@ -22,6 +22,8 @@ Para rodar os testes o comando é o seguinte:
 npm run test
 ```
 
+Ao final da visualização deste projeto, favor visualizar a branch *my-stack*, reescrevi a aplicação com mais robustez. Todos os comandos que funcionam aqui, funcionam igualmente nesta outra branch.
+
 # Análise inicial arquitetural
 
 Primeiramente identifiquei que o projeto utiliza a estrutura de use-cases, então resolvi alterar a estrutura de pastas para separar adequadamente as funções.
