@@ -22,7 +22,7 @@ Para rodar os testes o comando é o seguinte:
 npm run test
 ```
 
-Ao final da visualização deste projeto, favor visualizar a branch *my-stack*, reescrevi a aplicação com mais robustez. Todos os comandos que funcionam aqui, funcionam igualmente nesta outra branch.
+Ao final da visualização deste projeto, favor visualizar a branch *my-stack*, reescrevi a aplicação com mais robustez. Todos os comandos que funcionam aqui, funcionam igualmente nesta outra branch. O banco de dados depois de definido não necessita o setup, apenas a aplicação.
 
 # Análise inicial arquitetural
 
