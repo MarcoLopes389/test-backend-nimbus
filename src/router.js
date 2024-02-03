@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const endpoint = require('./use-cases/get-damage-summary-by-date/endpoint')
+const endpoint = require('./core/use-cases/endpoint')
 
 /**
  * @swagger

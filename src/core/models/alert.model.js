@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require("../sequelize");
 
-
 module.exports = sequelize.define('Alert', {
     id: {
         type: DataTypes.INTEGER,

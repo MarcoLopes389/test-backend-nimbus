@@ -1,6 +1,6 @@
 const useCase = require('./use-case');
-const repository = require('../../repositories/alert.repository');
-const successAlertMock = require('./mocks/success-alert.mock');
+const repository = require('../repositories/alert.repository');
+const successAlertMock = require('../mocks/success-alert.mock');
 
 describe('use case tests', () => {
     test('should return average, maximum and minimum events daily in date range', async () => {

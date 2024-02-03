@@ -1,7 +1,7 @@
 const supertest = require("supertest")
 const app = require("./main")
-const successAlertMock = require("./use-cases/get-damage-summary-by-date/mocks/success-alert.mock")
-const alertRepository = require("./repositories/alert.repository")
+const successAlertMock = require("./core/mocks/success-alert.mock")
+const alertRepository = require("./core/repositories/alert.repository")
 
 describe('e2e tests', () => {
     test('should return 400 if one of date is not sent', async () => {

@@ -1,11 +1,11 @@
 const moment = require('moment');
-const repository = require('../../repositories/alert.repository');
+const repository = require('../repositories/alert.repository');
 
 module.exports = {
     async execute(dateStart, dateEnd) {
-        const dbAlerts = await repository.findByDate(dateStart, dateEnd);
+        const alerts = await repository.findByDate(dateStart, dateEnd);
 
-        const grouped = dbAlerts
+        const grouped = alerts
             .reduce((result, alert) => {
                 const dateAlreadySummarized = result.find(({ date }) => date === alert.date);
                 const {
@@ -15,17 +15,28 @@ module.exports = {
                 } = { ...dateAlreadySummarized };
                 const date = alert.date;
                 const damages = (oldDamages || []).concat([alert.damage]);
-                let maxDamageEvent = alert;
+
+                let maxDamageEvent = {
+                    damage: alert.damage,
+                    event: alert.event,
+                };
                 if (oldMaxDamageEvent && oldMaxDamageEvent.damage > alert.damage) {
-                    maxDamageEvent = oldMaxDamageEvent;
-                }
-                let minDamageEvent = alert;;
-                if (oldMinDamageEvent && oldMinDamageEvent.damage < alert.damage) {
-                    minDamageEvent = oldMinDamageEvent;
+                    maxDamageEvent = {
+                        damage: oldMaxDamageEvent.damage,
+                        event: oldMaxDamageEvent.event,
+                    };
                 }
 
-                Reflect.deleteProperty(maxDamageEvent, 'date')
-                Reflect.deleteProperty(minDamageEvent, 'date')
+                let minDamageEvent = {
+                    damage: alert.damage,
+                    event: alert.event,
+                };
+                if (oldMinDamageEvent && oldMinDamageEvent.damage < alert.damage) {
+                    minDamageEvent = {
+                        damage: oldMinDamageEvent.damage,
+                        event: oldMinDamageEvent.event,
+                    };
+                }
 
                 if (dateAlreadySummarized) {
                     dateAlreadySummarized.damages = damages;
@@ -47,7 +58,7 @@ module.exports = {
         let lastDate = dateStart;
 
         // Notei que na resposta as datas que estavam no range e não possuíam dados deveria ser feito um preenchimento
-        while (lastDate < dateEnd) {
+        while (lastDate <= dateEnd) {
             if (!grouped.find(({ date }) => lastDate == date)) {
                 grouped.push({
                     damages: [],
@@ -62,11 +73,16 @@ module.exports = {
         return grouped
             .sort((a, b) => b.date.localeCompare(a.date))
             .map(summary => {
-                summary.avgDamage = Math.ceil(
+                const avgDamage = Math.ceil(
                     summary.damages.reduce((result, damage) => result + damage, 0) / summary.damages.length
                 ) || 0
-                Reflect.deleteProperty(summary, 'damages');
-                return summary;
+            
+                return {
+                    date: summary.date,
+                    avgDamage,
+                    maxDamageEvent: summary.maxDamageEvent,
+                    minDamageEvent: summary.minDamageEvent
+                };
             });
     },
 };
