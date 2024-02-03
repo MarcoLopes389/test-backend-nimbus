@@ -1,87 +1,67 @@
-## Teste técnico para Backend da Nimbus
+# Inicialização do projeto
 
-### Cenário
+Antes de executar qualquer comando, copie o arquivo .env.sample e altere com os dados de acesso ao banco de dados local.
+Caso prefira, pode executar o arquivo start-database{.sh,.bat} para criar uma máquina docker com postgres iniciado.
 
-A Nimbus foi contratada para gerir alertas baseados na previsão climática de uma região. O alerta deve informar o evento (quantidade de chuva ou velocidade do vento, por exemplo) e o nível do impacto do evento na operação da contratante nessa região.
+Para iniciar o banco de dados, deve-se rodar o comando:
+```bash
+npm run db:setup
+```
+Para iniciar a aplicação com instalação de dependências deve-se rodar:
+```bash
+npm run startup
+```
+Para fazer uma requisição ao endpoint criei dois arquivos de script, um para ambiente linux e outro para windows:
+- request.sh
+- request.bat
 
-Abaixo será descrito um dos casos de uso da aplicação que devemos desenvolver.
+Ambos os arquivos executam um cURL para chamada do endpoint.
 
-### Descrição do Caso de Uso `GetDamageSummaryByDate`
-
-A cada quinzena, a contratante fará um relatório com um resumo diário de impactos na região. Nesse resumo deve constar, para cada dia:
-- Média de impacto na operação
-- Evento de maior impacto
-- Evento de menor impacto
-
-Sendo assim, deve-se disponibilizar um endpoint na nossa aplicação que retorne essas informações baseadas em todos os eventos ocorridos dentro de um período estipulado. Esse resultado deve ser ordenado por data em ordem decrescente.
-
-Exemplo da requisição:
-
-`GET /damage-summary-by-date?dateStart=dateStart=2023-12-22&dateEnd=2024-01-05`
-
-Resposta:
-
-```json
-{
-    "data": [
-        {
-            "date": "2024-01-05",
-            "avgDamage": 68,
-            "maxDamageEvent": {
-                "event": "Pancada de chuva",
-                "damage": 82
-            },
-            "minDamageEvent": {
-                "event": "Chuva 12 mm",
-                "damage": 59
-            }
-        },
-        {
-            "date": "2024-01-04",
-            "avgDamage": 58,
-            "maxDamageEvent": {
-                "event": "Vento 9 m/s",
-                "damage": 73
-            },
-            "minDamageEvent": {
-                "event": "Ocorrência de raios a 17 km",
-                "damage": 48
-            }
-        },
-        {
-            "date": "2024-01-03",
-            "avgDamage": 0,
-            "maxDamageEvent": null,
-            "minDamageEvent": null
-        },
-        ...
-    ]
-}
-
+Para rodar os testes o comando é o seguinte:
+```bash
+npm run test
 ```
 
-### Instruções
+# Análise inicial arquitetural
 
-Uma pessoa na equipe criou a regra de negócio para o caso de uso. Porém, há bugs na implementação.
+Primeiramente identifiquei que o projeto utiliza a estrutura de use-cases, então resolvi alterar a estrutura de pastas para separar adequadamente as funções.
+Estou acostumado a utilizar classes para implementar meus projetos, porém como a implementação base está utilizando funções, preferi manter.
 
-Sua função é:
-- Implementar o endpoint para o caso de uso
-- Corrigir os bugs na regra de negócio
+Geralmente gosto de utilizar a seguinte arquitetura:
 
-Na pasta do projeto estão disponíveis arquivos de base para a implementação. O arquivo `src/get-damage-summary-by-date/controller.js` possui o código da regra de negócio, e o arquivo `src/get-damage-summary-by-date/controller.test.js` deve ser utilizado para criar os testes unitários da regra.
+- entities: entidades do negócio
+- dtos: modelos de transferência de dados
+- repositories: acesso a dados do banco de dados
+- controllers: onde ficam declarados os endpoints
+- services/use-cases: onde ficam as regras de negócio
 
-Não há obrigatoriedade de uso de ferramentas específicas, mas você deve utilizar ferramentas (à sua escolha) para os seguintes módulos:
-- Tratamento de requisições http
-- Acesso e criação do banco de dados
-- Testes unitários
+Por geralmente utilizar DDD, sempre separo os projetos por módulos, porém como é um projeto mais simples, preferi manter sem módulos
 
-No arquivo `data/alerts.json` está uma lista de alertas para utilizar como teste. Crie a tabela de alertas, de acordo com o formato das entidades presentes no arquivo, e preencha com esses alertas. Deve-se disponibilizar, junto à solução, todos os arquivos e códigos necessários para o setup do banco de dados.
+# Análise de stack
 
-O arquivo `src/get-damage-summary-by-date/request.http` possui um exemplo de requisição que será feita para o endpoint que será implementado.
+A stack padrão quando estou programando com javascript usando typescript costumo usar:
 
-### Atenção!
+- TypeORM (acesso a banco de dados)
+- Nestjs (requisições HTTP e injeção de dependência)
+- class-validator (Validação de dados de entrada)
 
-Quem vai revisar a solução deve rodar, no MÁXIMO, 3 comandos para testar a solução em um primeiro momento:
-- Setup do banco de dados
-- Rodar a aplicação (npm install && npm start)
-- Executar a requisição para o endpoint
+Para projetos com javascript puro, acredito que a seguinte stack seja mais interessante:
+
+- Sequelize (acesso a banco de dados)
+- Express
+
+Como a primeira stack geralmente é a que eu mais uso, decidi fazer outra implementação do projeto na branch *my-stack* para demonstrar habilidades.
+
+# Cenários de teste
+
+Para os testes, mapeei os seguintes tratamentos que devem ser feitos na regra de negócio:
+
+- Foi inserida um data de início maior que de fim
+- Foi inserido apenas uma das datas ou nenhuma
+- O range em questão não tem dados
+
+# Possíveis bugs encontrados no use case:
+
+- avg não estava sendo calculado, apenas era somado o total dos danos e não era feita nem a divisão nem o arredondamento
+- troquei o delete pela função própria para isto, que é do objeto Reflect
+- os objetos minDamageEvent e maxDamageEvent ficaram com as datas, mesmo não sendo necessário
