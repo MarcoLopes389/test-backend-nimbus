@@ -4,15 +4,6 @@ const successAlertMock = require("./use-cases/get-damage-summary-by-date/mocks/s
 const alertRepository = require("./repositories/alert.repository")
 
 describe('e2e tests', () => {
-    test('should return 404 if a date out of range is sent', async () => {
-        jest.spyOn(alertRepository, 'findByDate').mockReturnValue(
-            successAlertMock.filter((alert) => alert.date >= '2023-12-14' && alert.date <= '2024-01-09')
-        )
-        const result = await supertest(app).get('/damage-summary-by-date?dateStart=2023-12-14&dateEnd=2024-01-09')
-        expect(result.body.message).toEqual(expect.stringContaining('Nenhum alerta'))
-        expect(result.statusCode).toBe(404)
-    })
-
     test('should return 400 if one of date is not sent', async () => {
         const result = await supertest(app).get('/damage-summary-by-date?dateStart=2023-12-14')
         expect(result.body.message).toEqual(expect.stringContaining('precisa enviar'))

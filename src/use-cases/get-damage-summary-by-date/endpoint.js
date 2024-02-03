@@ -20,15 +20,8 @@ module.exports = {
 
         const result = await useCase.execute(dateStart, dateEnd)
 
-        if (result.length > 0) {
-            return res.status(200).json({
-                data: result
-            })
-        }
-
-        return res.status(404).json({
-            status: 404,
-            message: 'Nenhum alerta encontrado para a faixa de tempo passada.'
+        return res.status(200).json({
+            data: result
         })
     },
 };

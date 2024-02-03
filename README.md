@@ -65,3 +65,4 @@ Para os testes, mapeei os seguintes tratamentos que devem ser feitos na regra de
 - avg não estava sendo calculado, apenas era somado o total dos danos e não era feita nem a divisão nem o arredondamento
 - troquei o delete pela função própria para isto, que é do objeto Reflect
 - os objetos minDamageEvent e maxDamageEvent ficaram com as datas, mesmo não sendo necessário
+- para dias que não possuem dados no mesmo range precisam ser adicionados

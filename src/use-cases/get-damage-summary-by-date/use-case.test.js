@@ -19,12 +19,14 @@ describe('use case tests', () => {
         expect(lastResult.date.localeCompare(dateStart)).toEqual(0)
 
         for (const event of result) {
-            expect(event.avgDamage).toBeLessThanOrEqual(event.maxDamageEvent.damage)
-            expect(event.avgDamage).toBeGreaterThanOrEqual(event.minDamageEvent.damage)
+            if (event.avgDamage != 0) {
+                expect(event.avgDamage).toBeLessThanOrEqual(event.maxDamageEvent.damage)
+                expect(event.avgDamage).toBeGreaterThanOrEqual(event.minDamageEvent.damage)
+            }
         }
     });
 
-    test('should not return anything in a date range not covered', async () => {
+    test('should return all fields as null in a date range not covered', async () => {
         const dateStart = '2023-12-22';
         const dateEnd = '2024-01-05';
 
@@ -33,6 +35,12 @@ describe('use case tests', () => {
         )
 
         const result = await useCase.execute(dateStart, dateEnd);
-        expect(result.length).toBe(0)
+        expect(result.length).toBeGreaterThan(0)
+        
+        for (const event of result) {
+            expect(event.avgDamage).toBe(0)
+            expect(event.maxDamageEvent).toBeNull()
+            expect(event.minDamageEvent).toBeNull()
+        }
     })
 })
