@@ -1,3 +1,5 @@
+## AVISO: para inicialização deste projeto é recomendado node na versão 18.3 ou superior
+
 # Inicialização do projeto
 
 Antes de executar qualquer comando, copie o arquivo .env.sample e altere com os dados de acesso ao banco de dados local.
@@ -44,13 +46,15 @@ A stack padrão quando estou programando com javascript usando typescript costum
 - TypeORM (acesso a banco de dados)
 - Nestjs (requisições HTTP e injeção de dependência)
 - class-validator (Validação de dados de entrada)
+- Swagger (documentação)
 
 Para projetos com javascript puro, acredito que a seguinte stack seja mais interessante:
 
 - Sequelize (acesso a banco de dados)
 - Express
+- Swagger (documentação)
 
-Como a primeira stack geralmente é a que eu mais uso, decidi fazer outra implementação do projeto na branch *my-stack* para demonstrar habilidades.
+Com ambas as stacks é possível obter o mesmo resultado, porém neste projeto utilizei a segunda.
 
 # Cenários de teste
 
@@ -58,7 +62,7 @@ Para os testes, mapeei os seguintes tratamentos que devem ser feitos na regra de
 
 - Foi inserida um data de início maior que de fim
 - Foi inserido apenas uma das datas ou nenhuma
-- O range em questão não tem dados
+- O range em questão não possui eventos, porém é necessário enviar valores nulos nesse caso
 
 # Possíveis bugs encontrados no use case:
 
